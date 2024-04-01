@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: openai-demo
+openai:
+  api:
+    url: "https://api.openai.com/v1/chat/completions"
+    key: "your-api-key"
+
