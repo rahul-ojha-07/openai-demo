@@ -1,6 +1,7 @@
 package com.example.openaidemo.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,11 +15,12 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@JsonIgnoreProperties(ignoreUnknown = true,value = "saveHistory")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatCompletionRequestDTO {
     @Schema(example = "gpt-3.5-turbo")
     private String model;
     private List<MessageDTO> messages;
     @Schema(example = "false")
-    private Boolean saveHistory = false;
+    @JsonProperty(value = "saveHistory", access = JsonProperty.Access.WRITE_ONLY)
+    private Boolean saveHistory;
 }

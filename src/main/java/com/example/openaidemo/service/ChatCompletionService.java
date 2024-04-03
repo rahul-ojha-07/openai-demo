@@ -2,7 +2,6 @@ package com.example.openaidemo.service;
 
 import com.example.openaidemo.dto.ChatCompletionRequestDTO;
 import com.example.openaidemo.dto.ChatCompletionResponseDTO;
-
 import com.example.openaidemo.dto.MessageDTO;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -21,31 +20,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatCompletionService {
 
-    @Value("${openai.api.url}")
-    private String openAiURL;
-
-    @Value("${openai.api.key}")
-    private String openAiKey;
-
     @NonNull
     RestTemplate restTemplate;
-
+    @Value("${openai.api.url}")
+    private String openAiURL;
+    @Value("${openai.api.key}")
+    private String openAiKey;
     private List<MessageDTO> history;
 
 
     public ChatCompletionResponseDTO processRequest(ChatCompletionRequestDTO chatCompletionRequest) {
-        HttpEntity<ChatCompletionRequestDTO> httpEntity = new HttpEntity<>(chatCompletionRequest,httpHeaders());
-        ResponseEntity<ChatCompletionResponseDTO> chatCompletionResponse ;
+        HttpEntity<ChatCompletionRequestDTO> httpEntity = new HttpEntity<>(chatCompletionRequest, httpHeaders());
+        ResponseEntity<ChatCompletionResponseDTO> chatCompletionResponse = ResponseEntity.ok(null);
         try {
+            if (chatCompletionRequest.getSaveHistory()) {
+                saveHistoryRequest(chatCompletionRequest);
+                chatCompletionRequest.setMessages(history);
+            }
             chatCompletionResponse = restTemplate.exchange(URI.create(openAiURL), HttpMethod.POST, httpEntity, ChatCompletionResponseDTO.class);
             if (chatCompletionRequest.getSaveHistory()) {
-                saveHistory(chatCompletionRequest, chatCompletionResponse.getBody());
+                saveHistoryResponse(chatCompletionResponse.getBody());
             }
         } catch (Exception e) {
             log.error("Unable to complete request ", e);
@@ -58,6 +57,7 @@ public class ChatCompletionService {
 
     /**
      * Set HTTP Headers here
+     *
      * @return httpHeaders
      */
     private HttpHeaders httpHeaders() {
@@ -67,7 +67,13 @@ public class ChatCompletionService {
         return headers;
     }
 
-    private void saveHistory(ChatCompletionRequestDTO request, ChatCompletionResponseDTO response) {
+
+    /**
+     * Save the request messages to previous messages
+     *
+     * @param request request to send to openAI api
+     */
+    private void saveHistoryRequest(ChatCompletionRequestDTO request) {
         if (history == null) history = new ArrayList<>();
         if (history.isEmpty()) {
             history.addAll(request.getMessages()
@@ -79,6 +85,15 @@ public class ChatCompletionService {
                     .filter(x -> !x.getRole().equals("system"))
                     .toList());
         }
+    }
+
+    /**
+     * Save the assistant response messages to the history
+     *
+     * @param response response returned after calling the openAi API
+     */
+    private void saveHistoryResponse(ChatCompletionResponseDTO response) {
+        if (history == null) history = new ArrayList<>();
         if (!response.getChoices().isEmpty()) {
             history.add(response.getChoices().get(0).getMessage());
         }
