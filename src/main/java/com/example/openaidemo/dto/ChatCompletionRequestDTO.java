@@ -22,5 +22,5 @@ public class ChatCompletionRequestDTO {
     private List<MessageDTO> messages;
     @Schema(example = "false")
     @JsonProperty(value = "saveHistory", access = JsonProperty.Access.WRITE_ONLY)
-    private Boolean saveHistory;
+    private boolean saveHistory;
 }

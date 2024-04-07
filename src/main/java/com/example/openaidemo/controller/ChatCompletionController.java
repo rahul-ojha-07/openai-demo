@@ -2,6 +2,7 @@ package com.example.openaidemo.controller;
 
 
 import com.example.openaidemo.dto.ChatCompletionRequestDTO;
+import com.example.openaidemo.dto.ChatCompletionResponseDTO;
 import com.example.openaidemo.service.ChatCompletionService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,7 @@ public class ChatCompletionController {
     ChatCompletionService chatCompletionService;
 
     @PostMapping("/chat")
-    ResponseEntity<?> processRequest(@RequestBody ChatCompletionRequestDTO chatCompletionRequest) {
+    ResponseEntity<ChatCompletionResponseDTO> processRequest(@RequestBody ChatCompletionRequestDTO chatCompletionRequest) {
         return ResponseEntity.ok(chatCompletionService.processRequest(chatCompletionRequest));
     }
 }

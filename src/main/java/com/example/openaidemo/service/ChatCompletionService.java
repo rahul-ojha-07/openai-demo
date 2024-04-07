@@ -38,12 +38,12 @@ public class ChatCompletionService {
         HttpEntity<ChatCompletionRequestDTO> httpEntity = new HttpEntity<>(chatCompletionRequest, httpHeaders());
         ResponseEntity<ChatCompletionResponseDTO> chatCompletionResponse = ResponseEntity.ok(null);
         try {
-            if (chatCompletionRequest.getSaveHistory()) {
+            if (chatCompletionRequest.isSaveHistory()) {
                 saveHistoryRequest(chatCompletionRequest);
                 chatCompletionRequest.setMessages(history);
             }
             chatCompletionResponse = restTemplate.exchange(URI.create(openAiURL), HttpMethod.POST, httpEntity, ChatCompletionResponseDTO.class);
-            if (chatCompletionRequest.getSaveHistory()) {
+            if (chatCompletionRequest.isSaveHistory()) {
                 saveHistoryResponse(chatCompletionResponse.getBody());
             }
         } catch (Exception e) {
